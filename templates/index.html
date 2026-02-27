@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Manufacturing Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta http-equiv="refresh" content="5">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Smart Manufacturing Monitoring System</h1>
+
+    <div class="card">
+        <h2>Total Units Produced</h2>
+        <p>{{ total }}</p>
+    </div>
+
+    <div class="card">
+        <h2>Defective Units</h2>
+        <p>{{ defective }}</p>
+    </div>
+
+    <div class="card">
+        <h2>Quality Rate</h2>
+        <p>{{ quality }}%</p>
+    </div>
+
+    <div class="card {% if quality < 95 %}alert{% endif %}">
+        <h2>Status</h2>
+        <p>{{ alert }}</p>
+    </div>
+
+    <h2>Recent Production Logs</h2>
+
+    <table>
+        <tr>
+            <th>Total</th>
+            <th>Defective</th>
+            <th>Quality %</th>
+            <th>Time</th>
+        </tr>
+
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.total_units }}</td>
+            <td>{{ log.defective_units }}</td>
+            <td>{{ log.quality_rate }}</td>
+            <td>{{ log.timestamp }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <canvas id="qualityChart"></canvas>
+
+<script>
+const ctx = document.getElementById('qualityChart').getContext('2d');
+
+const qualityData = [
+{% for log in logs %}
+    {{ log.quality_rate }},
+{% endfor %}
+];
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: qualityData.map((_, index) => index + 1),
+        datasets: [{
+            label: 'Quality Trend',
+            data: qualityData,
+            borderColor: 'blue',
+            fill: false
+        }]
+    }
+});
+</script>
+
+</div>
+
+</body>
+</html>
